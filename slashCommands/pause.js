@@ -3,14 +3,13 @@ const { getVoiceConnection } = require('@discordjs/voice');
 
 module.exports = {
   data: new SlashCommandBuilder()
-        .setName("Pause")
+        .setName("pause")
         .setDescription("Pause the song"),
 
   async execute(interaction){
     const connection = getVoiceConnection();
 
     if (connection){
-      connection.
       interaction.reply('Pausing')
     }
     else {

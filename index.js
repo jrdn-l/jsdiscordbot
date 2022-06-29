@@ -3,15 +3,13 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Intents } = require('discord.js');
 const { token } = require('./config.json');
-const { joinVoiceChannel } = require('@discordjs/voice');
-
-
+const music = require('./commands/music');
 
 // Create a new client instance
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MESSAGES] });
 
 client.commands = new Collection();
-const commandsPath = path.join(__dirname, 'commands');
+const commandsPath = path.join(__dirname, 'slashCommands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
@@ -36,9 +34,9 @@ client.on('interactionCreate', async interaction => {
 
 	if (!command) return;
 
-	try{
+	try {
 		await command.execute(interaction);
-	} catch (error){
+	} catch (error) {
 		console.log(error);
 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 	}
@@ -46,13 +44,19 @@ client.on('interactionCreate', async interaction => {
 
 // Idk if I like this better or not. I'll have to see
 client.on('messageCreate', async message => {
-	if(message.content === '!join') {
-		joinVoiceChannel({
-				channelId: message.member.voice.channel.id,
-				guildId: message.guild.id,
-				adapterCreator: message.guild.voiceAdapterCreator
-		})
-}
+	if (message.content === '!join') {
+		music.join(message.guildId, message.guild.voiceAdapterCreator, message.member.voice.channel.id);
+	} else if (message.content.startsWith('!play')) {
+		music.play(message.content.slice(6), message.guildId, message.guild.voiceAdapterCreator, message.member.voice.channel.id);
+	} else if (message.content.startsWith('!shuffle')){
+		music.shuffle(message.guildId);
+	} else if (message.content.startsWith('!pause')) {
+		music.pause(message.guildId);
+	} else if (message.content.startsWith('!stop')){
+		music.stop(message.guildId)
+	} else if (message.content.startsWith('!loop')){
+		music.loop(message.guildId);
+	}
 });
 
 

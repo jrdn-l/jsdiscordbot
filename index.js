@@ -47,7 +47,7 @@ client.on('messageCreate', async message => {
 	if (message.content === '!join') {
 		music.join(message.guildId, message.guild.voiceAdapterCreator, message.member.voice.channel.id);
 	} else if (message.content.startsWith('!play')) {
-		music.play(message.content.slice(6), message.guildId, message.guild.voiceAdapterCreator, message.member.voice.channel.id);
+		await music.play(message.content.slice(6), message.guildId, message.guild.voiceAdapterCreator, message.member.voice.channel.id);
 	} else if (message.content.startsWith('!shuffle')){
 		music.shuffle(message.guildId);
 	} else if (message.content.startsWith('!pause')) {

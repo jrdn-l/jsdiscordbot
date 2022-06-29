@@ -1,18 +1,51 @@
 // TODO --- THIS IS NOT CORRECT. I need to look more into this. Don't use for now
 
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { createAudioPlayer, NoSubscriberBehavior, createAudioResource } = require('@discordjs/voice');
+const { createAudioPlayer, getVoiceConnection, 
+				createAudioResource, joinVoiceChannel,
+				StreamType
+			} = require('@discordjs/voice');
+const ytdl = require('ytdl-core');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('play')
-		.setDescription('Play a Song!'),
+		.setDescription('Play a Song!')
+		.addStringOption(option =>
+      option.setName('input')
+        .setDescription('Link or name of song to play')
+        .setRequired(true)),
+
 	async execute(interaction) {
-		const player = createAudioPlayer({
-            behaviors:{
-                noSubscriber: NoSubscriberBehavior.Pause
-            },
-        });
-        const resource = createAudioResource('C:/Users/Jordan/Documents/CSC301/finalprojectw22-allaboardgames/main/client/src/assets/sound/success-fanfare-trumpets-6185.mp3');
+		let connection = getVoiceConnection(interaction.guildId);
+		if (!connection){
+			connection = joinVoiceChannel({
+				channelId: interaction.member.voice.channel.id,
+				guildId: interaction.guildId,
+				adapterCreator: interaction.guild.voiceAdapterCreator
+			})
+		}
+
+		const downloaded = ytdl(interaction.options.getString('input'), 
+		{
+			quality: "highestaudio",
+			filter: format => format.container === 'webm'
+		});
+
+		const resource = createAudioResource(downloaded, {
+				inputType: StreamType.WebmOpus
+		});
+
+		/*
+    const resource = createAudioResource(
+			interaction.options.getString('input'),
+		{ inlineVolume: true});
+		//resource.volume.setVolume(0.2);*/
+
+		const player = createAudioPlayer();
+		connection.subscribe(player)
+		player.play(resource);
+		console.log("done");
+		interaction.reply('playing!');
 	},
 };

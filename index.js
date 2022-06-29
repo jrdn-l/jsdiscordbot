@@ -3,12 +3,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Intents } = require('discord.js');
 const { token } = require('./config.json');
-
+const { joinVoiceChannel } = require('@discordjs/voice');
 
 
 
 // Create a new client instance
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MESSAGES] });
 
 client.commands = new Collection();
 const commandsPath = path.join(__dirname, 'commands');
@@ -44,9 +44,15 @@ client.on('interactionCreate', async interaction => {
 	}
 });
 
-
-client.on('message', message => {
-	console.log(message);
+// Idk if I like this better or not. I'll have to see
+client.on('messageCreate', async message => {
+	if(message.content === '!join') {
+		joinVoiceChannel({
+				channelId: message.member.voice.channel.id,
+				guildId: message.guild.id,
+				adapterCreator: message.guild.voiceAdapterCreator
+		})
+}
 });
 
 

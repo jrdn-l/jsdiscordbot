@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { getVoiceConnection } = require('@discordjs/voice');
+const { pause } = require("../commands/music.js")
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -7,14 +7,7 @@ module.exports = {
 		.setDescription('Pause the song'),
 
 	async execute(interaction) {
-		const connection = getVoiceConnection();
-
-		if (connection) {
-			interaction.reply('Pausing');
-		}
-		else {
-			interaction.reply('Can\'t pause my dude');
-		}
+		pause(interaction.guildId);
 	},
 
 };

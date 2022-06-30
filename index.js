@@ -3,7 +3,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Intents } = require('discord.js');
 const { token } = require('./config.json');
-const music = require('./commands/music');
+const { checkMusic } = require('./commands/music');
+
 
 // Create a new client instance
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MESSAGES] });
@@ -36,7 +37,8 @@ client.on('interactionCreate', async interaction => {
 
 	try {
 		await command.execute(interaction);
-	} catch (error) {
+	}
+	catch (error) {
 		console.log(error);
 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 	}
@@ -44,19 +46,8 @@ client.on('interactionCreate', async interaction => {
 
 // Idk if I like this better or not. I'll have to see
 client.on('messageCreate', async message => {
-	if (message.content === '!join') {
-		music.join(message.guildId, message.guild.voiceAdapterCreator, message.member.voice.channel.id);
-	} else if (message.content.startsWith('!play')) {
-		await music.play(message.content.slice(6), message.guildId, message.guild.voiceAdapterCreator, message.member.voice.channel.id);
-	} else if (message.content.startsWith('!shuffle')){
-		music.shuffle(message.guildId);
-	} else if (message.content.startsWith('!pause')) {
-		music.pause(message.guildId);
-	} else if (message.content.startsWith('!stop')){
-		music.stop(message.guildId)
-	} else if (message.content.startsWith('!loop')){
-		music.loop(message.guildId);
-	}
+
+	checkMusic(client, message);
 });
 
 

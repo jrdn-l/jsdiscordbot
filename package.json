@@ -5,8 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon .",
-    "commands": "node deploy-commands.js"
+    "start": "node .",
+    "dev": "nodemon .",
+    "commands": "node deploy-commands.js",
+    "replit": "./node_modules/node/bin/node index.js",
+    "lint": "eslint .",
+    "lint_fix": "eslint . --fix"
   },
   "author": "",
   "license": "ISC",

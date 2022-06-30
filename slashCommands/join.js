@@ -7,13 +7,13 @@ module.exports = {
 		.setDescription('Join a voice chat'),
 	async execute(interaction) {
 		await this.executeNoreply(interaction);
-		interaction.reply("Joining!");
+		interaction.reply('Joining!');
 	},
 	async executeNoReply(interaction) {
 		return joinVoiceChannel({
 			channelId: interaction.member.voice.channel.id,
 			guildId: interaction.guildId,
-			adapterCreator: interaction.guild.voiceAdapterCreator
-		})
-	}
+			adapterCreator: interaction.guild.voiceAdapterCreator,
+		});
+	},
 };

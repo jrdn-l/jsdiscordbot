@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { join } = require("../commands/music.js")
+const { join } = require('../commands/join');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -8,5 +8,5 @@ module.exports = {
 	async execute(interaction) {
 		join(interaction.guildId, interaction.guild.voiceAdapterCreator, interaction.member.voice.channel.id);
 		interaction.reply('Joining!');
-	}
+	},
 };

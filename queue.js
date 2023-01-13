@@ -1,12 +1,11 @@
 const players = global.players;
-const { MessageEmbed } = require('discord.js');
+const { MessageEmbed, SlashCommandBuilder } = require('discord.js');
 module.exports = {
-	name: 'queue',
-	utilisation: '{prefix}queue',
-	aliases: ['q'],
-	voiceChannel: true,
-
-	async execute(client, message) {
+	data: new SlashCommandBuilder()
+	.setName("queue")
+	.setDescription("Shows the current queue of songs"),
+	
+	async execute(interaction) {
 		this.showQueue(message.guildId)
 		//message.channel.send({ embeds: [] });
 	},

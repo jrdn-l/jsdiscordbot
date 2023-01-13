@@ -1,19 +1,22 @@
 const players = global.players;
 const { getVoiceConnection } = require('@discordjs/voice');
-module.exports = {
-	name: 'loop',
-	utilisation: '{prefix}loop',
-	voiceChannel: true,
+const { SlashCommandBuilder } = require('@discordjs/builders');
 
-	async execute(client, message) {
-		const res = this.loop(message.guildId);
+module.exports = {
+
+	data: new SlashCommandBuilder()
+		.setName("loop")
+		.setDescription("Loops the current song if possible"),
+
+	async execute(interaction) {
+		const res = this.loop(interaction.guildId);
 		if (res === undefined) return;
 
 		if (res) {
-			message.react('✅');
+			await interaction.reply('Looping');
 		}
 		else {
-			message.react('❌');
+			await interaction.reply('Unlooping');
 		}
 	},
 

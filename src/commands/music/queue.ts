@@ -1,5 +1,5 @@
 const players = global.players;
-const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
+import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("queue")

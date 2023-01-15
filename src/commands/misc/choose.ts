@@ -1,4 +1,5 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+import { SlashCommandBuilder } from '@discordjs/builders';
+import { ChatInputCommandInteraction } from 'discord.js';
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -8,8 +9,9 @@ module.exports = {
 			option.setName('input')
 				.setDescription('The items you want choosen from separated by spaces')
 				.setRequired(true)),
-	async execute(interaction) {
-		const responses = interaction.options.getString('input').split(' ');
+	async execute(interaction: ChatInputCommandInteraction) {
+		const responses = interaction.options.getString('input')?.split(' ');
+		if (!responses) return;
 		await interaction.reply(responses[Math.floor(Math.random() * responses.length)]);
 	},
 };

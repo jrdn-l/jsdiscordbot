@@ -1,8 +1,8 @@
 // Require the necessary discord.js classes
-const fs = require('node:fs');
-const path = require('node:path');
-const { Client, Collection, GatewayIntentBits } = require('discord.js');
-const { token, prefix } = require('../config.json');
+import { readdirSync } from 'node:fs';
+import { join } from 'node:path';
+import { ChatInputCommandInteraction, Client, Collection, GatewayIntentBits } from 'discord.js';
+import { token, prefix } from './config.json';
 
 
 // Create a new client instance
@@ -23,19 +23,19 @@ client.commands = new Collection();
 client.slashCommands = new Collection();
 
 // Get slash commands
-const slashCommandsPath = path.join(__dirname, 'commands');
-const slashCommandFiles = [];
-const innerPaths = [];
-fs.readdirSync(slashCommandsPath).forEach((folder) => {
-	let folderpath = path.join(slashCommandsPath, folder);
-	files = fs.readdirSync(folderpath).filter(file => file.endsWith('js'));
+const slashCommandsPath = join(__dirname, 'commands');
+const slashCommandFiles: string[] = [];
+const innerPaths: string[] = [];
+readdirSync(slashCommandsPath).forEach((folder) => {
+	let folderpath = join(slashCommandsPath, folder);
+	let files = readdirSync(folderpath).filter(file => file.endsWith('ts'));
 	slashCommandFiles.push(...files);
-	for (_ of files)
+	for (let _ of files)
 		innerPaths.push(folderpath);
 });
 
 slashCommandFiles.forEach( (file, index) => {
-	const filePath = path.join(innerPaths[index], file);
+	const filePath = join(innerPaths[index], file);
 	const command = require(filePath);
 	// Set a new item in the Collection
 	// With the key as the command name and the value as the exported module
@@ -59,7 +59,7 @@ client.once('ready', () => {
 });
 
 
-client.on('interactionCreate', async interaction => {
+client.on('interactionCreate', async (interaction: ChatInputCommandInteraction) => {
 	if (!interaction.isCommand()) return;
 	const command = client.slashCommands.get(interaction.commandName);
 

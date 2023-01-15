@@ -1,23 +1,23 @@
-const fs = require('node:fs');
-const path = require('node:path');
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
-const { clientId, guildId, token } = require('../config.json');
+import { readdirSync } from 'node:fs';
+import { join } from 'node:path';
+import { REST } from '@discordjs/rest';
+import { Routes } from 'discord-api-types/v9';
+import { clientId, guildId, token } from '../config.json';
 
 const commands = [];
-const commandsPath = path.join(__dirname, 'commands');
+const commandsPath = join(__dirname, 'commands');
 const commandFiles = [];
 const innerPaths = [];
-fs.readdirSync(commandsPath).forEach((folder) => {
-	let folderpath = path.join(commandsPath, folder);
-	files = fs.readdirSync(folderpath).filter(file => file.endsWith('js'));
+readdirSync(commandsPath).forEach((folder) => {
+	let folderpath = join(commandsPath, folder);
+	files = readdirSync(folderpath).filter(file => file.endsWith('js'));
 	commandFiles.push(...files);
 	for (_ of files)
 		innerPaths.push(folderpath);
 });
 
 commandFiles.forEach((file, index) => {
-	const filePath = path.join(innerPaths[index], file);
+	const filePath = join(innerPaths[index], file);
 	const command = require(filePath);
 	commands.push(command.data.toJSON());
 })

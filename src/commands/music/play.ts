@@ -1,19 +1,19 @@
-const { createAudioPlayer, createAudioResource, StreamType, AudioPlayerStatus } = require('@discordjs/voice');
-const { join: joinVoice } = require('./join');
-const { stop } = require('./stop');
-const ytdl = require('ytdl-core');
-const ytsr = require('ytsr');
-const ytpl = require('ytpl');
-const { SlashCommandBuilder } = require('@discordjs/builders');
-// const video = require('fluent-ffmpeg/lib/options/video');
+import { createAudioPlayer, createAudioResource, StreamType, AudioPlayerStatus, AudioPlayer } from '@discordjs/voice';
+import { join as joinVoice } from './join';
+import { stop } from './stop';
+import ytdl from 'ytdl-core';
+import ytsr from 'ytsr';
+import ytpl from 'ytpl';
+import { SlashCommandBuilder } from '@discordjs/builders';
+import { Player, VideoMetaData } from 'src/types';
+import { ChatInputCommandInteraction, GuildMember, InternalDiscordGatewayAdapterCreator } from 'discord.js';
 
-const players = global.players;
+const players: {[guildId: string]: Player} = global.players;
 
 
-const streamSource = (video) => {
+const streamSource = (video: VideoMetaData) => {
 	const downloaded = ytdl(video.id, {
 		filter: 'audioonly',
-		fmt: 'webm',
 		highWaterMark: 1 << 62,
 		// liveBuffer: 1 << 62,
 		// disabling chunking is recommended in discord bot
@@ -21,12 +21,10 @@ const streamSource = (video) => {
 		quality: 'highestaudio',
 	});
 
-	return createAudioResource(downloaded, {
-		inputType: StreamType.WebmOpus,
-	});
+	return createAudioResource(downloaded);
 };
 
-const search = async (message) => {
+const search = async (message: string) : Promise<VideoMetaData[]> => {
 	// if (ytdl.validateURL(message) || ytdl.validateID(message)) {
 	// 	return message;
 	// }
@@ -34,12 +32,13 @@ const search = async (message) => {
 	if (ytpl.validateID(message)) {
 		// TODO: Make queue
 		console.log('Playlist!');
-		return;
+		return [];
 	}
 
 	const meta = await ytsr(message, { limit: 1 });
-	const res = meta.items[0];
-	data = {
+	const res = meta.items[0] as any;
+
+	let data = {
 		name: res.title,
 		id: res.id,
 		url: res.url,
@@ -48,9 +47,9 @@ const search = async (message) => {
 	return [data];
 };
 
-const streamPlay = async (message, guildId, voiceAdapterCreator, channelId) => {
+const streamPlay = async (message: string, guildId: string, voiceAdapterCreator: InternalDiscordGatewayAdapterCreator, channelId: string) => {
 	const connection = joinVoice(guildId, voiceAdapterCreator, channelId);
-	let player;
+	let player: AudioPlayer;
 
 	const video = await search(message);
 	console.log(video);
@@ -98,7 +97,8 @@ const streamPlay = async (message, guildId, voiceAdapterCreator, channelId) => {
 				metadata.current = metadata.queue.shift();
 				metadata.skip = false;
 			}
-			resource = streamSource(metadata.current);
+			let current = metadata.current!
+			resource = streamSource(current);
 			player.play(resource);
 		}
 	});
@@ -114,8 +114,16 @@ module.exports = {
 			.setDescription("The song you want to listen to, can be url or name")
 			.setRequired(true)
 		),
-	async execute(interaction) {
-		const first = streamPlay(interaction.options.getString('input'), interaction.guildId, interaction.guild.voiceAdapterCreator, interaction.member.voice.channel.id);
-		await interaction.reply(!first ? "Playing" : "Added To Queue");
+	async execute(interaction: ChatInputCommandInteraction) {
+		let input = interaction.options.getString('input');
+		let guildId = interaction.guildId || null;
+		let voiceAdapter = interaction.guild ? interaction.guild.voiceAdapterCreator : null;
+		let member = interaction.member ? interaction.member as GuildMember : null;
+		let voiceId = member ? member.voice.channelId : null;
+
+		if (input && guildId && voiceAdapter && voiceId){
+			const first = streamPlay(input, guildId, voiceAdapter, voiceId);
+			await interaction.reply(!first ? "Playing" : "Added To Queue");
+		}
 	}
 };

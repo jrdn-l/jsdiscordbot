@@ -1,5 +1,5 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const shuffle = require('shuffle-array');
+import { SlashCommandBuilder } from '@discordjs/builders';
+import shuffle from 'shuffle-array';
 const players = global.players;
 
 module.exports = {

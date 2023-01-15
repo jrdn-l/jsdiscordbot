@@ -1,7 +1,10 @@
 import { getVoiceConnection } from '@discordjs/voice';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction } from 'discord.js';
-const players = global.players;
+import { Players } from '../../players';
+
+const players = Players.players;
+
 
 export const stop = (guildId: string): void => {
 	const connection = getVoiceConnection(guildId);
@@ -18,6 +21,7 @@ module.exports = {
 
 
 	async execute(interaction: ChatInputCommandInteraction) {
+		if (!interaction.guildId) return;
 		stop(interaction.guildId);
 		await interaction.reply('Bye Bye');
 	},

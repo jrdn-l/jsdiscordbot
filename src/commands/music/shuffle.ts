@@ -1,6 +1,10 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
+import { ChatInputCommandInteraction } from 'discord.js';
 import shuffle from 'shuffle-array';
-const players = global.players;
+import { Players } from '../../players';
+
+const players = Players.players;
+
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -8,12 +12,13 @@ module.exports = {
 	.setDescription("Shuffles the queue"),
 
 	
-	async execute(interaction) {
+	async execute(interaction: ChatInputCommandInteraction) {
+		if (!interaction.guildId) return;
 		this.shuffleQueue(interaction.guildId);
 		await interaction.reply("Shuffled!")
 	},
 
-	shuffleQueue(guildId) {
+	shuffleQueue(guildId: string) {
 		shuffle(players[guildId].queue);
 	},
 };

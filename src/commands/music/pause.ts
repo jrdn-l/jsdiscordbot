@@ -1,7 +1,9 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction } from 'discord.js';
+import { Players } from '../../players';
 
-const players = global.players;
+const players = Players.players;
+
 
 module.exports = {
 

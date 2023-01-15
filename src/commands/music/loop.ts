@@ -1,7 +1,9 @@
-const players = global.players;
 import { getVoiceConnection } from '@discordjs/voice';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction } from 'discord.js';
+import { Players } from '../../players';
+
+const players = Players.players;
 
 module.exports = {
 
@@ -21,7 +23,7 @@ module.exports = {
 		}
 	},
 
-	loop(guildId: string): void {
+	loop(guildId: string): boolean {
 		const connection = getVoiceConnection(guildId);
 		const data = players[guildId];
 		if (data && connection) {

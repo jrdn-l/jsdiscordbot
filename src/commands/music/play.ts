@@ -5,10 +5,12 @@ import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
 import ytpl from 'ytpl';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { Player, VideoMetaData } from 'src/types';
+import { VideoMetaData } from '../..//types';
 import { ChatInputCommandInteraction, GuildMember, InternalDiscordGatewayAdapterCreator } from 'discord.js';
+import { Players } from '../../players';
 
-const players: {[guildId: string]: Player} = global.players;
+const players = Players.players;
+
 
 
 const streamSource = (video: VideoMetaData) => {

@@ -1,12 +1,12 @@
-// Require the necessary discord.js classes
+require('dotenv').config();
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { ChatInputCommandInteraction, Client, Collection, GatewayIntentBits } from 'discord.js';
-import { token, prefix } from './config.json';
+import { ChatInputCommandInteraction, Client, Collection, CommandInteraction, Events, GatewayIntentBits, Interaction } from 'discord.js';
+import { SlashCommand } from './types';
 
 
 // Create a new client instance
-global.client = new Client({
+const client = new Client({
 	intents: [
 		GatewayIntentBits.DirectMessages,
 		GatewayIntentBits.Guilds,
@@ -16,11 +16,8 @@ global.client = new Client({
 		GatewayIntentBits.GuildVoiceStates
 	]
 });
-const client = global.client;
-global.players = {};
 
-client.commands = new Collection();
-client.slashCommands = new Collection();
+const slashCommands = new Collection<string, SlashCommand>();
 
 // Get slash commands
 const slashCommandsPath = join(__dirname, 'commands');
@@ -39,29 +36,21 @@ slashCommandFiles.forEach( (file, index) => {
 	const command = require(filePath);
 	// Set a new item in the Collection
 	// With the key as the command name and the value as the exported module
-	client.slashCommands.set(command.data.name, command);
+	slashCommands.set(command.data.name, command);
 })
 
 
-// // Get text commands
-// const commandsPath = path.join(__dirname, 'commands');
-// const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-// for (const file of commandFiles) {
-// 	const command = require(path.join(commandsPath, file));
-// 	client.commands.set(command.name, command);
-// 	// delete require.cache[require.resolve(path.join(commandsPath, file))];
-// }
-
 // When the client is ready, run this code (only once)
-client.once('ready', () => {
+client.once(Events.ClientReady, () => {
 	console.log('Ready!');
-	client.user.setPresence({ activities: [{ name: 'A New Game' }], status: 'online' });
+	if (client.user)
+		client.user.setPresence({ activities: [{ name: 'A New Game' }], status: 'online' });
 });
 
 
-client.on('interactionCreate', async (interaction: ChatInputCommandInteraction) => {
+client.on(Events.InteractionCreate, async (interaction: Interaction) => {
 	if (!interaction.isCommand()) return;
-	const command = client.slashCommands.get(interaction.commandName);
+	const command = slashCommands.get(interaction.commandName);
 
 	if (!command) return;
 
@@ -74,19 +63,7 @@ client.on('interactionCreate', async (interaction: ChatInputCommandInteraction) 
 	}
 });
 
-// // Idk if I like this better or not. I'll have to see
-// client.on('messageCreate', async message => {
-// 	if (message.author.bot || message.channel.type === 'dm') return;
-// 	console.log(message);
-// 	if (!message.content.startsWith(prefix)) return;
-// 	const args = message.cleanContent.slice(prefix.length).split(' ');
-// 	const command = args.shift();
-// 	const cmd = client.commands.get(command) || client.commands.find(item => item.aliases && item.aliases.includes(command));
-// 	if (cmd) {
-// 		await cmd.execute(client, message, args);
-// 	}
-// 	message.reply({content: JSON.stringify(message)});
-// });
+
 
 // Login to Discord with your client's token
-client.login(token);
+client.login(process.env.TOKEN);

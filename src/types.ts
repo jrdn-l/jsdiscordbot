@@ -1,18 +1,11 @@
 import { AudioPlayer} from "@discordjs/voice";
-import { ChatInputCommandInteraction, Client, Collection, Message, SlashCommandBuilder } from "discord.js";
-
-export const TYPES = {
-    Bot: Symbol("Bot"),
-    Client: Symbol("Client"),
-    Token: Symbol("Token"),
-}
-
+import { Interaction, Client, Collection, CommandInteraction, Message, SlashCommandBuilder } from "discord.js";
 export interface Player {
     player: AudioPlayer,
     queue: VideoMetaData[],
     loop: boolean,
     current?: VideoMetaData,
-    skip: false,
+    skip: boolean,
     timeout?: NodeJS.Timeout
 }
 
@@ -25,7 +18,7 @@ export interface VideoMetaData {
 
 export interface SlashCommand {
     command: SlashCommandBuilder | any,
-    execute: (interaction : ChatInputCommandInteraction) => void
+    execute: (interaction : Interaction) => void
 }
 
 export interface Command {
@@ -36,13 +29,7 @@ export interface Command {
 
 declare module "discord.js" {
     export interface Client {
-        slashCommands: Collection<string, SlashCommand>
-        commands: Collection<string, Command>,
+        slashCommands: Collection<string, SlashCommand>,
         cooldowns: Collection<string, number>
     }
-}
-
-export namespace Global {
-    export var players: {[guildId: string]: Player}
-    export var client: Client
 }

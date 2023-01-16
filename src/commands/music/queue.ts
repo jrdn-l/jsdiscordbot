@@ -13,8 +13,8 @@ module.exports = {
 	},
 
 	async showQueue(interaction: ChatInputCommandInteraction, guildId: string) {
-		console.log(players[guildId].queue);
 		const player = players[guildId];
+		if (!player) return interaction.reply(`No music currently playing`)
 		const queue = player.queue;
 
 		if (!player.current) return interaction.reply(`No music currently playing`);
@@ -22,7 +22,7 @@ module.exports = {
 		if (queue.length == 0) return interaction.reply(`No music in the queue after the current one!`);
 
 		const embed = new EmbedBuilder();
-		const tracks = queue.map((track, i) => `**${i + 1}** - ${track.name}`);
+		const tracks = queue.map((track, i) => `**${i + 1}** - [${track.name}](${track.url})`);
 
 		const songs = queue.length;
 		const nextSongs = songs > 5 ? `And **${songs - 5}** other song(s)...` : `In the playlist **${songs}** song(s)...`;

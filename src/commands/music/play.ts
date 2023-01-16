@@ -1,4 +1,4 @@
-import { createAudioPlayer, createAudioResource, StreamType, AudioPlayerStatus, AudioPlayer } from '@discordjs/voice';
+import { createAudioPlayer, createAudioResource, AudioPlayerStatus, AudioPlayer } from '@discordjs/voice';
 import { join as joinVoice } from './join';
 import { stop } from './stop';
 import ytdl from 'ytdl-core';
@@ -40,7 +40,7 @@ const search = async (message: string) : Promise<VideoMetaData[]> => {
 	const meta = await ytsr(message, { limit: 1 });
 	const res = meta.items[0] as any;
 
-	let data = {
+	let data: VideoMetaData = {
 		name: res.title,
 		id: res.id,
 		url: res.url,
@@ -49,20 +49,19 @@ const search = async (message: string) : Promise<VideoMetaData[]> => {
 	return [data];
 };
 
-const streamPlay = async (message: string, guildId: string, voiceAdapterCreator: InternalDiscordGatewayAdapterCreator, channelId: string) => {
+const streamPlay = async (message: string, guildId: string, voiceAdapterCreator: InternalDiscordGatewayAdapterCreator, channelId: string): Promise<string> => {
 	const connection = joinVoice(guildId, voiceAdapterCreator, channelId);
 	let player: AudioPlayer;
 
 	const video = await search(message);
-	console.log(video);
+	// console.log(video);
 
 	if (players[guildId]) {
 		const info = players[guildId];
 		player = info.player;
 		if (player.state.status === 'playing') {
 			info.queue.push(...video);
-			console.log('Added to queue');
-			return true;
+			return `Added [${video[0].name}](${video[0].url}) to queue!`;
 		}
 		if (players[guildId].timeout) {
 			clearTimeout(players[guildId].timeout);
@@ -74,16 +73,19 @@ const streamPlay = async (message: string, guildId: string, voiceAdapterCreator:
 		player = createAudioPlayer();
 		connection.subscribe(player);
 		players[guildId] = { player: player, queue: [], loop: false, current: video[0], skip: false, timeout: undefined };
+		registerEvents(player, guildId);
 	}
 
 	let resource = streamSource(video[0]);
 	player.play(resource);
-
 	
-	// Events
-	player.on(AudioPlayerStatus.Playing, () => {
-		console.log('Playing!');
-	});
+	return `Playing [${video[0].name}](${video[0].url})`;
+}
+
+const registerEvents = (player: AudioPlayer, guildId: string) => {
+	// player.on(AudioPlayerStatus.Playing, () => {
+	// 	console.log('Playing!');
+	// });
 	player.on('error', error => {
 		console.error(`Error: ${error.message}`);
 	});
@@ -91,7 +93,7 @@ const streamPlay = async (message: string, guildId: string, voiceAdapterCreator:
 	player.on(AudioPlayerStatus.Idle, () => {
 		const metadata = players[guildId];
 		if (!metadata.loop && metadata.queue.length === 0) {
-			console.log('starting timeout');
+			// console.log('starting timeout');
 			metadata.timeout = setTimeout(() => stop(guildId), 20000);
 		}
 		else {
@@ -100,11 +102,10 @@ const streamPlay = async (message: string, guildId: string, voiceAdapterCreator:
 				metadata.skip = false;
 			}
 			let current = metadata.current!
-			resource = streamSource(current);
+			let resource = streamSource(current);
 			player.play(resource);
 		}
 	});
-	return false;
 }
 
 module.exports = {
@@ -124,8 +125,8 @@ module.exports = {
 		let voiceId = member ? member.voice.channelId : null;
 
 		if (input && guildId && voiceAdapter && voiceId){
-			const first = streamPlay(input, guildId, voiceAdapter, voiceId);
-			await interaction.reply(!first ? "Playing" : "Added To Queue");
+			const reply = await streamPlay(input, guildId, voiceAdapter, voiceId);
+			await interaction.reply(reply);
 		}
 	}
 };

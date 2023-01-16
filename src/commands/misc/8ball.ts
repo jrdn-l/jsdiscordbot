@@ -1,4 +1,5 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+import { SlashCommandBuilder } from '@discordjs/builders';
+import { ChatInputCommandInteraction } from 'discord.js';
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -8,7 +9,7 @@ module.exports = {
 			option.setName('question')
 				.setDescription('The question you want answered')
 				.setRequired(true)),
-	async execute(interaction) {
+	async execute(interaction: ChatInputCommandInteraction) {
 		const responses = ['It is certain', 'It is decidedly so', 'Without a doubt',
 			'Yes - definitely', 'You may rely on it', 'As I see it yes',
 			'Most likely', 'Outlook good', 'Yes', 'Signs point to yes',

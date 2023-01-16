@@ -1,6 +1,9 @@
-const players = global.players;
-const { getVoiceConnection } = require('@discordjs/voice');
-const { SlashCommandBuilder } = require('@discordjs/builders');
+import { getVoiceConnection } from '@discordjs/voice';
+import { SlashCommandBuilder } from '@discordjs/builders';
+import { ChatInputCommandInteraction } from 'discord.js';
+import { Players } from '../../players';
+
+const players = Players.players;
 
 module.exports = {
 
@@ -8,7 +11,7 @@ module.exports = {
 		.setName("loop")
 		.setDescription("Loops the current song if possible"),
 
-	async execute(interaction) {
+	async execute(interaction: ChatInputCommandInteraction) {
 		const res = this.loop(interaction.guildId);
 		if (res === undefined) return;
 
@@ -20,7 +23,7 @@ module.exports = {
 		}
 	},
 
-	loop(guildId) {
+	loop(guildId: string): boolean {
 		const connection = getVoiceConnection(guildId);
 		const data = players[guildId];
 		if (data && connection) {

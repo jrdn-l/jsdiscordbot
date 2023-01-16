@@ -1,25 +1,28 @@
-const players = global.players;
-const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
+import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
+import { Players } from '../../players';
+
+const players = Players.players;
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("queue")
 		.setDescription("Shows the current queue of songs"),
 
-	async execute(interaction) {
+	async execute(interaction: ChatInputCommandInteraction) {
 		await this.showQueue(interaction, interaction.guildId)
 	},
 
-	async showQueue(interaction, guildId) {
-		console.log(players[guildId].queue);
+	async showQueue(interaction: ChatInputCommandInteraction, guildId: string) {
 		const player = players[guildId];
+		if (!player) return interaction.reply(`No music currently playing`)
 		const queue = player.queue;
 
 		if (!player.current) return interaction.reply(`No music currently playing`);
 
-		if (queue.length == 0) return interaction.reply(`No music in the queue after the current one ${interaction.author}... try again ?`);
+		if (queue.length == 0) return interaction.reply(`No music in the queue after the current one!`);
 
 		const embed = new EmbedBuilder();
-		const tracks = queue.map((track, i) => `**${i + 1}** - ${track.name}`);
+		const tracks = queue.map((track, i) => `**${i + 1}** - [${track.name}](${track.url})`);
 
 		const songs = queue.length;
 		const nextSongs = songs > 5 ? `And **${songs - 5}** other song(s)...` : `In the playlist **${songs}** song(s)...`;

@@ -1,6 +1,9 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+import { SlashCommandBuilder } from '@discordjs/builders';
+import { ChatInputCommandInteraction } from 'discord.js';
+import { Players } from '../../players';
 
-const players = global.players;
+const players = Players.players;
+
 
 module.exports = {
 
@@ -9,12 +12,12 @@ data: new SlashCommandBuilder()
 	.setDescription("Pause music if possible")
 	,
 
-	async execute(interaction) {
+	async execute(interaction: ChatInputCommandInteraction) {
 		this.pause(interaction.guildId);
 		await interaction.reply('Pausing');
 	},
 
-	pause(guildId) {
+	pause(guildId: string): void {
 		const player = players[guildId].player;
 		if (!players[guildId]) return;
 

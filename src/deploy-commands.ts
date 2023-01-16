@@ -10,7 +10,7 @@ const commandFiles = [];
 const innerPaths = [];
 readdirSync(commandsPath).forEach((folder) => {
 	let folderpath = join(commandsPath, folder);
-	let files = readdirSync(folderpath).filter(file => file.endsWith('js'));
+	let files = readdirSync(folderpath).filter(file => file.endsWith('ts'));
 	commandFiles.push(...files);
 	for (let _ of files)
 		innerPaths.push(folderpath);

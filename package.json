@@ -9,7 +9,7 @@
     "commands": "ts-node src/deploy-commands.ts",
     "lint": "eslint .",
     "lint_fix": "eslint . --fix",
-    "docker-start": "docker build . -t discordbotjs && docker run discordbotjs"
+    "docker": "docker build . -t discordbotjs && docker run --env-file ./.env discordbotjs"
   },
   "author": "",
   "license": "ISC",

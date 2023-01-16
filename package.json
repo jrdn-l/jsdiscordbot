@@ -8,8 +8,10 @@
     "start": "ts-node src/index.ts",
     "commands": "ts-node src/deploy-commands.ts",
     "lint": "eslint .",
-    "lint_fix": "eslint . --fix",
-    "docker": "docker build . -t discordbotjs && docker run --env-file ./.env discordbotjs"
+    "lint:fix": "eslint . --fix",
+    "docker:b": "docker build . -t jrdnl/jsdiscordbot",
+    "docker:s": "docker run --env-file ./.env --name discordbot jrdnl/jsdiscordbot",
+    "docker:bs": "docker build . -t jrdnl/jsdiscordbot && docker run --env-file ./.env --name discordbot jrdnl/jsdiscordbot"
   },
   "author": "",
   "license": "ISC",

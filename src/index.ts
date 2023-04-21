@@ -1,7 +1,7 @@
 require('dotenv').config();
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { ChatInputCommandInteraction, Client, Collection, CommandInteraction, Events, GatewayIntentBits, Interaction } from 'discord.js';
+import { Client, Collection, Events, GatewayIntentBits, Interaction } from 'discord.js';
 import { SlashCommand } from './types';
 
 
